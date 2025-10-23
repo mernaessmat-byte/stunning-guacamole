@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TASC Outsourcing - Client Portal</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #f5f7fa;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #e5e7eb;
+            padding: 24px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo-container {
+            padding: 0 24px 32px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #0c5273;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .logo-t {
+            color: #0c5273;
+        }
+
+        .logo-a {
+            color: #00c9a7;
+        }
+
+        .sidebar-section {
+            margin-bottom: 24px;
+        }
+
+        .sidebar-title {
+            padding: 0 24px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #6b7280;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #374151;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            font-size: 15px;
+        }
+
+        .nav-item:hover {
+            background: #f3f4f6;
+        }
+
+        .nav-item.active {
+            background: #e6f4f1;
+            color: #0c5273;
+            border-left-color: #0c5273;
+            font-weight: 500;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 24px 32px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .notification-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            position: relative;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .user-profile:hover {
+            background: #f3f4f6;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #fbbf24;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #1f2937;
+            font-size: 14px;
+        }
+
+        .user-name {
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            background: #0c5273;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+
+        .btn-primary:hover {
+            background: #0a4460;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #0c5273;
+            border: 1px solid #0c5273;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .btn-secondary:hover {
+            background: #e6f4f1;
+        }
+
+        /* Auth Pages */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f4f8;
+        }
+
+        .auth-card {
+            background: white;
+            padding: 48px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .auth-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .auth-subtitle {
+            color: #6b7280;
+            text-align: center;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #0c5273;
+        }
+
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 20px 0;
+        }
+
+        .btn-full {
+            width: 100%;
+            padding: 14px;
+            font-size: 15px;
+            justify-content: center;
+        }
+
+        .auth-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .auth-link a {
+            color: #0c5273;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .forgot-password a {
+            color: #0c5273;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .lock-icon {
+            width: 80px;
+            height: 80px;
+            background: #0c5273;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        /* Dashboard Cards */
+        .welcome-section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .welcome-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .welcome-subtitle {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .view-details {
+            color: #0c5273;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Chart Section */
+        .chart-section {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .date-range {
+            font-size: 14px;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Service Cards */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+            gap: 24px;
+        }
+
+        .service-card {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .service-header {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .service-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .service-info {
+            flex: 1;
+        }
+
+        .service-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #10b981;
+            margin-bottom: 8px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+        .service-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 12px;
+        }
+
+        .service-description {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .service-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .learn-more {
+            color: #0c5273;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Form Styles */
+        .form-container {
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .back-button {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            color: #374151;
+            padding: 8px;
+        }
+
+        .form-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .form-group-full {
+            grid-column: 1 / -1;
+        }
+
+        .file-upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 32px;
+            text-align: center;
+            background: #f9fafb;
+        }
+
+        .upload-button {
+            background: #fbbf24;
+            color: #1f2937;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .upload-info {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 40px;
+        }
+
+        /* Notifications */
+        .notification-panel {
+            position: fixed;
+            right: 0;
+            top: 0;
+            height: 100vh;
+            width: 400px;
+            background: white;
+            box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .notification-panel.open {
+            transform: translateX(0);
+        }
+
+        .notification-header {
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .close-button {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            color: #6b7280;
+        }
+
+        .notification-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .notification-item {
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .notification-item-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .notification-item-title {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 14px;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+
+        .notification-text {
+            color: #6b7280;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .copilot-button {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            background: #0c5273;
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 24px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(12, 82, 115, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+        }
+
+        .copilot-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #00c9a7, #0c5273);
+            border-radius: 50%;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Phone Input */
+        .phone-input {
+            display: flex;
+            gap: 8px;
+        }
+
+        .country-code {
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 100px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .flag-icon {
+            width: 20px;
+            height: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Icons Component
+        const Icons = {
+            Home: () => (
+                <svg className="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+            ),
+            Document: () => (
+                <svg className="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+            ),
+            List: () => (
+                <svg className="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            ),
+            Invoice: () => (
+                <svg className="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+            ),
+            Trophy: () => (
+                <svg className="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                </svg>
+            ),
+            Book: () => (
+                <svg className="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            ),
+            Plus: () => (
+                <svg className="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+            ),
+            Copilot: () => (
+                <svg className="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            ),
+            Ticket: () => (
+                <svg className="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                </svg>
+            ),
+            Star: () => (
+                <svg className="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                </svg>
+            ),
+            Bell: () => (
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+            ),
+            ChevronDown: () => (
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+            ),
+            Eye: () => (
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+            ),
+            ExternalLink: () => (
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+            ),
+            Mail: () => (
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+            ),
+            Lock: () => (
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+            ),
+            User: () => (
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+            ),
+            Calendar: () => (
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+            ),
+            ArrowLeft: () => (
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+            ),
+            X: () => (
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            ),
+        };
+
+        // Login Component
+        function Login({ onLogin }) {
+            const [email, setEmail] = useState('');
+            const [password, setPassword] = useState('');
+            const [rememberMe, setRememberMe] = useState(false);
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                onLogin();
+            };
+
+            return (
+                <div className="auth-container">
+                    <div className="auth-card">
+                        <div className="auth-logo">
+                            <div className="logo">
+                                <span className="logo-t">T</span>
+                                <span className="logo-a">A</span>
+                                <span className="logo-t">SC</span>
+                            </div>
+                        </div>
+                        <h1 className="auth-title">Welcome to TASC Outsourcing!</h1>
+                        <p className="auth-subtitle">Please enter your email address and password to log in.</p>
+                        
+                        <form onSubmit={handleSubmit}>
+                            <div className="form-group">
+                                <label className="form-label">Email address</label>
+                                <div className="input-wrapper">
+                                    <div className="input-icon"><Icons.Mail /></div>
+                                    <input 
+                                        type="email" 
+                                        className="form-input" 
+                                        placeholder="Example@example.com"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">Password</label>
+                                <div className="input-wrapper">
+                                    <div className="input-icon"><Icons.Lock /></div>
+                                    <input 
+                                        type="password" 
+                                        className="form-input" 
+                                        placeholder="Enter your password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-checkbox">
+                                <input 
+                                    type="checkbox" 
+                                    id="remember" 
+                                    checked={rememberMe}
+                                    onChange={(e) => setRememberMe(e.target.checked)}
+                                />
+                                <label htmlFor="remember">Remember me</label>
+                            </div>
+
+                            <div className="forgot-password">
+                                <a href="#forgot">Forgot Password?</a>
+                            </div>
+
+                            <button type="submit" className="btn-primary btn-full">
+                                Log in
+                            </button>
+
+                            <div className="auth-link">
+                                Don't have an account? <a href="#signup">Sign up</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        }
+
+        // Sidebar Component
+        function Sidebar({ currentPage, onNavigate }) {
+            const menuItems = [
+                { id: 'dashboard', label: 'Dashboard', icon: <Icons.Home />, section: 'GENERAL' },
+                { id: 'request', label: 'Request a Service', icon: <Icons.Document />, section: 'GENERAL' },
+                { id: 'track', label: 'Track Requests', icon: <Icons.List />, section: 'GENERAL' },
+                { id: 'invoices', label: 'Invoices', icon: <Icons.Invoice />, section: 'GENERAL' },
+                { id: 'nudges', label: 'Nudges', icon: <Icons.Trophy />, section: 'GENERAL' },
+                { id: 'knowledge', label: 'Knowledge Base', icon: <Icons.Book />, section: 'GENERAL' },
+                { id: 'addons', label: 'Add Ons', icon: <Icons.Plus />, section: 'GENERAL' },
+                { id: 'copilot', label: 'Copilot', icon: <Icons.Copilot />, section: 'NEED HELP?' },
+                { id: 'tickets', label: 'Tickets', icon: <Icons.Ticket />, section: 'NEED HELP?' },
+                { id: 'rate', label: 'Rate Us', icon: <Icons.Star />, section: 'OTHRES' },
+            ];
+
+            let currentSection = '';
+
+            return (
+                <aside className="sidebar">
+                    <div className="logo-container">
+                        <div className="logo">
+                            <span className="logo-t">T</span>
+                            <span className="logo-a">A</span>
+                            <span className="logo-t">SC</span>
+                        </div>
+                    </div>
+                    
+                    {menuItems.map((item) => {
+                        const showSection = item.section !== currentSection;
+                        currentSection = item.section;
+                        
+                        return (
+                            <React.Fragment key={item.id}>
+                                {showSection && (
+                                    <div className="sidebar-section">
+                                        <div className="sidebar-title">{item.section}</div>
+                                    </div>
+                                )}
+                                <div 
+                                    className={`nav-item ${currentPage === item.id ? 'active' : ''}`}
+                                    onClick={() => onNavigate(item.id)}
+                                >
+                                    {item.icon}
+                                    {item.label}
+                                </div>
+                            </React.Fragment>
+                        );
+                    })}
+                </aside>
+            );
+        }
+
+        // Header Component
+        function Header({ onNotificationClick }) {
+            return (
+                <div className="header-actions">
+                    <button className="notification-btn" onClick={onNotificationClick}>
+                        <Icons.Bell />
+                    </button>
+                    <div className="user-profile">
+                        <div className="user-avatar">AM</div>
+                        <span className="user-name">Ahmad Magdi</span>
+                        <Icons.ChevronDown />
+                    </div>
+                </div>
+            );
+        }
+
+        // Dashboard Component
+        function Dashboard({ onNotificationClick }) {
+            const chartRef = useRef(null);
+            const chartInstance = useRef(null);
+
+            useEffect(() => {
+                if (chartRef.current) {
+                    const ctx = chartRef.current.getContext('2d');
+                    
+                    if (chartInstance.current) {
+                        chartInstance.current.destroy();
+                    }
+
+                    chartInstance.current = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Request Name', 'Request Name', 'Request Name', 'Request Name', 'Request Name', 'Request Name', 'Request Name', 'Request Name', 'Request Name', 'Request Name'],
+                            datasets: [{
+                                data: [48, 44, 39, 34, 30, 26, 23, 20, 16, 12],
+                                backgroundColor: '#0c5273',
+                                borderRadius: 4,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 50,
+                                    ticks: {
+                                        stepSize: 10
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                return () => {
+                    if (chartInstance.current) {
+                        chartInstance.current.destroy();
+                    }
+                };
+            }, []);
+
+            const stats = [
+                { value: '3,542', label: 'Total Associates', icon: '👥', color: '#e0f2fe' },
+                { value: '240', label: 'Open Requests', icon: '📝', color: '#f3e8ff' },
+                { value: '321', label: 'Open Roles', icon: '💼', color: '#d1fae5' },
+                { value: '143', label: 'Associates in onboarding stage', icon: '🔄', color: '#dbeafe' },
+                { value: '87', label: 'Off-boarded Associates', icon: '📋', color: '#fee2e2' },
+                { value: '89', label: 'Nudges', icon: '⏰', color: '#fef3c7' },
+            ];
+
+            return (
+                <>
+                    <div className="header">
+                        <h1 className="page-title">Dashboard</h1>
+                        <Header onNotificationClick={onNotificationClick} />
+                    </div>
+
+                    <div className="welcome-section">
+                        <h2 className="welcome-title">Hello, {'{Client Name}'} 👋</h2>
+                        <p className="welcome-subtitle">Welcome to TASC Outsourcing!</p>
+                    </div>
+
+                    <div className="stats-grid">
+                        {stats.map((stat, index) => (
+                            <div key={index} className="stat-card">
+                                <div className="stat-header">
+                                    <div>
+                                        <div className="stat-value">{stat.value}</div>
+                                        <div className="stat-label">{stat.label}</div>
+                                    </div>
+                                    <div className="stat-icon" style={{ background: stat.color }}>
+                                        {stat.icon}
+                                    </div>
+                                </div>
+                                <a href="#" className="view-details">
+                                    <Icons.Eye /> View Details
+                                </a>
+                            </div>
+                        ))}
+                    </div>
+
+                    <div className="chart-section">
+                        <div className="chart-header">
+                            <h3 className="chart-title">
+                                Type & number of requests
+                                <span style={{ fontSize: '16px', marginLeft: '8px' }}>ⓘ</span>
+                            </h3>
+                            <div className="date-range">
+                                <Icons.Calendar />
+                                14th, Feb 2024 - 21st, Mar 2024
+                            </div>
+                        </div>
+                        <div style={{ height: '300px' }}>
+                            <canvas ref={chartRef}></canvas>
+                        </div>
+                    </div>
+                </>
+            );
+        }
+
+        // Request a Service Component
+        function RequestService({ onNavigate, onNotificationClick }) {
+            const services = [
+                {
+                    title: 'Mobility Services',
+                    description: 'Relocate talent effortlessly with our comprehensive support, from visa processing to settling-in services. We ensure compliance with local regulations and smooth transitions. Leave the complexities to us.',
+                    icon: '🌐',
+                    color: '#d1fae5'
+                },
+                {
+                    title: 'Contracting Services',
+                    description: 'Scale your workforce as needed, with us handling all HR, legal, and administrative tasks. We sponsor the talent, ensuring a seamless experience for your business. Focus on your projects while we manage the rest.',
+                    icon: '📝',
+                    color: '#d1fae5'
+                },
+                {
+                    title: 'Premium Iqama',
+                    description: 'Manage Premium Iqama applications with ease through our efficient process. Our experts provide guidance for swift, hassle-free approvals. We handle the details, so you can focus on your priorities.',
+                    icon: '🌍',
+                    color: '#d1fae5'
+                },
+                {
+                    title: 'Soft Landing Services',
+                    description: 'Ensure a smooth transition for employees and their families with our support in housing, schooling, and local integration. We help them settle in comfortably, so they can focus on their new roles.',
+                    icon: '✈️',
+                    color: '#d1fae5'
+                },
+            ];
+
+            return (
+                <>
+                    <div className="header">
+                        <h1 className="page-title">Request a Service</h1>
+                        <Header onNotificationClick={onNotificationClick} />
+                    </div>
+
+                    <div className="services-grid">
+                        {services.map((service, index) => (
+                            <div key={index} className="service-card">
+                                <div className="service-header">
+                                    <div className="service-icon" style={{ background: service.color }}>
+                                        {service.icon}
+                                    </div>
+                                    <div className="service-info">
+                                        <div className="service-status">
+                                            <span className="status-dot"></span>
+                                            Active
+                                        </div>
+                                        <h3 className="service-title">{service.title}</h3>
+                                    </div>
+                                </div>
+                                <p className="service-description">{service.description}</p>
+                                <div className="service-actions">
+                                    <a href="#" className="learn-more">
+                                        <Icons.ExternalLink /> Learn more
+                                    </a>
+                                    <button 
+                                        className="btn-primary"
+                                        onClick={() => onNavigate('submit-request')}
+                                    >
+                                        + Submit Request
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </>
+            );
+        }
+
+        // Submit Request Component
+        function SubmitRequest({ onBack, onNotificationClick }) {
+            const [formData, setFormData] = useState({
+                candidateName: '',
+                nationality: '',
+                hiringType: '',
+                email: '',
+                phone: '',
+                jobProfession: ''
+            });
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                alert('Request submitted successfully!');
+            };
+
+            return (
+                <>
+                    <div className="header">
+                        <h1 className="page-title">Request a Service</h1>
+                        <Header onNotificationClick={onNotificationClick} />
+                    </div>
+
+                    <div className="form-container">
+                        <div className="form-header">
+                            <button className="back-button" onClick={onBack}>
+                                <Icons.ArrowLeft />
+                            </button>
+                            <h2 className="form-title">Request Contracting Services</h2>
+                        </div>
+
+                        <form onSubmit={handleSubmit}>
+                            <div className="form-grid">
+                                <div className="form-group">
+                                    <label className="form-label">Candidate Name</label>
+                                    <div className="input-wrapper">
+                                        <div className="input-icon"><Icons.User /></div>
+                                        <input 
+                                            type="text" 
+                                            className="form-input" 
+                                            placeholder="Enter Candidate Name"
+                                            value={formData.candidateName}
+                                            onChange={(e) => setFormData({...formData, candidateName: e.target.value})}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Nationality</label>
+                                    <div className="input-wrapper">
+                                        <div className="input-icon">🏳️</div>
+                                        <select 
+                                            className="form-input"
+                                            value={formData.nationality}
+                                            onChange={(e) => setFormData({...formData, nationality: e.target.value})}
+                                        >
+                                            <option>Select Candidate Nationality</option>
+                                            <option>United Arab Emirates</option>
+                                            <option>Saudi Arabia</option>
+                                            <option>Egypt</option>
+                                            <option>United Kingdom</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Select Hiring Type</label>
+                                    <div className="input-wrapper">
+                                        <div className="input-icon"><Icons.User /></div>
+                                        <select 
+                                            className="form-input"
+                                            value={formData.hiringType}
+                                            onChange={(e) => setFormData({...formData, hiringType: e.target.value})}
+                                        >
+                                            <option>Select Hiring Type</option>
+                                            <option>Full-time</option>
+                                            <option>Part-time</option>
+                                            <option>Contract</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Email Address</label>
+                                    <div className="input-wrapper">
+                                        <div className="input-icon"><Icons.Mail /></div>
+                                        <input 
+                                            type="email" 
+                                            className="form-input" 
+                                            placeholder="Enter Candidate Email Address"
+                                            value={formData.email}
+                                            onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Candidate Number</label>
+                                    <div className="phone-input">
+                                        <div className="country-code">
+                                            +44 🇬🇧 ▼
+                                        </div>
+                                        <input 
+                                            type="tel" 
+                                            className="form-input" 
+                                            placeholder="Enter Candidate mobile number"
+                                            style={{ paddingLeft: '12px' }}
+                                            value={formData.phone}
+                                            onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Job profession assigned</label>
+                                    <div className="input-wrapper">
+                                        <div className="input-icon"><Icons.Document /></div>
+                                        <input 
+                                            type="text" 
+                                            className="form-input" 
+                                            placeholder="Enter Candidate Job profession assigned"
+                                            value={formData.jobProfession}
+                                            onChange={(e) => setFormData({...formData, jobProfession: e.target.value})}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Upload passport, degree, and country of residency ID copy</label>
+                                    <div className="file-upload-area">
+                                        <button type="button" className="upload-button">Add files</button>
+                                        <p className="upload-info">Accepts .PDF, .JPG, and .PNG</p>
+                                    </div>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Upload passport, degree, and country of residency ID copy</label>
+                                    <div className="file-upload-area">
+                                        <button type="button" className="upload-button">Add files</button>
+                                        <p className="upload-info">Accepts .PDF, .JPG, and .PNG</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" className="btn-primary btn-full">
+                                Submit Request
+                            </button>
+                        </form>
+                    </div>
+                </>
+            );
+        }
+
+        // Add Ons Component
+        function AddOns({ onNotificationClick }) {
+            const addOns = [
+                {
+                    title: 'APIs Requests',
+                    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.',
+                    icon: '🌐',
+                    color: '#d1fae5'
+                },
+                {
+                    title: 'TASC Services',
+                    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.',
+                    icon: '📝',
+                    color: '#d1fae5'
+                },
+                {
+                    title: 'Whitelbaelling licencse',
+                    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.',
+                    icon: '🌍',
+                    color: '#d1fae5'
+                },
+                {
+                    title: 'Soft Landing Services',
+                    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit.',
+                    icon: '✈️',
+                    color: '#d1fae5'
+                },
+            ];
+
+            return (
+                <>
+                    <div className="header">
+                        <h1 className="page-title">Add Ons</h1>
+                        <Header onNotificationClick={onNotificationClick} />
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                        {addOns.map((addon, index) => (
+                            <div key={index} className="service-card" style={{ maxWidth: 'none' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                    <div className="service-header">
+                                        <div className="service-icon" style={{ background: addon.color }}>
+                                            {addon.icon}
+                                        </div>
+                                        <div>
+                                            <h3 className="service-title">{addon.title}</h3>
+                                            <p className="service-description" style={{ marginBottom: 0 }}>{addon.description}</p>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-end' }}>
+                                        <button className="btn-primary">
+                                            <Icons.Plus /> Request Service
+                                        </button>
+                                        <a href="#" className="learn-more">
+                                            <Icons.ExternalLink /> Learn more
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </>
+            );
+        }
+
+        // Notification Panel Component
+        function NotificationPanel({ isOpen, onClose }) {
+            const notifications = [
+                {
+                    title: 'Notification Title',
+                    time: '1 Hour Ago',
+                    text: 'Lorem ipsum dolor sit amet, consectetur sed adipiscing elit, sed do eiusmod tempor.',
+                    icon: '📦',
+                    color: '#d1fae5'
+                },
+                {
+                    title: 'Notification Title',
+                    time: '1 Hour Ago',
+                    text: 'Lorem ipsum dolor sit amet, consectetur sed adipiscing elit, sed do eiusmod tempor.',
+                    icon: '📦',
+                    color: '#fee2e2'
+                },
+            ];
+
+            return (
+                <div className={`notification-panel ${isOpen ? 'open' : ''}`}>
+                    <div className="notification-header">
+                        <h3 className="notification-title">Notifications</h3>
+                        <button className="close-button" onClick={onClose}>
+                            <Icons.X />
+                        </button>
+                    </div>
+                    <div className="notification-list">
+                        {notifications.map((notif, index) => (
+                            <div key={index} className="notification-item">
+                                <div className="notification-item-header">
+                                    <div className="notification-icon" style={{ background: notif.color }}>
+                                        {notif.icon}
+                                    </div>
+                                    <div style={{ flex: 1 }}>
+                                        <div className="notification-item-title">{notif.title}</div>
+                                        <div className="notification-time">{notif.time}</div>
+                                    </div>
+                                </div>
+                                <p className="notification-text">{notif.text}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        // Main App Component
+        function App() {
+            const [isLoggedIn, setIsLoggedIn] = useState(false);
+            const [currentPage, setCurrentPage] = useState('dashboard');
+            const [showNotifications, setShowNotifications] = useState(false);
+
+            if (!isLoggedIn) {
+                return <Login onLogin={() => setIsLoggedIn(true)} />;
+            }
+
+            const renderPage = () => {
+                switch (currentPage) {
+                    case 'dashboard':
+                        return <Dashboard onNotificationClick={() => setShowNotifications(true)} />;
+                    case 'request':
+                        return <RequestService 
+                            onNavigate={setCurrentPage} 
+                            onNotificationClick={() => setShowNotifications(true)} 
+                        />;
+                    case 'submit-request':
+                        return <SubmitRequest 
+                            onBack={() => setCurrentPage('request')} 
+                            onNotificationClick={() => setShowNotifications(true)} 
+                        />;
+                    case 'addons':
+                        return <AddOns onNotificationClick={() => setShowNotifications(true)} />;
+                    default:
+                        return (
+                            <>
+                                <div className="header">
+                                    <h1 className="page-title">{currentPage.charAt(0).toUpperCase() + currentPage.slice(1)}</h1>
+                                    <Header onNotificationClick={() => setShowNotifications(true)} />
+                                </div>
+                                <div style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>
+                                    This page is under development
+                                </div>
+                            </>
+                        );
+                }
+            };
+
+            return (
+                <div className="app-container">
+                    <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
+                    <main className="main-content">
+                        {renderPage()}
+                    </main>
+                    <NotificationPanel 
+                        isOpen={showNotifications} 
+                        onClose={() => setShowNotifications(false)} 
+                    />
+                    <button className="copilot-button">
+                        <div className="copilot-icon"></div>
+                        Copilot
+                    </button>
+                </div>
+            );
+        }
+
+        // Render the app
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
